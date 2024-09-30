@@ -26,6 +26,31 @@ def mdp_value_iteration(mdp: MDP, max_iter: int = 1000, gamma=1.0) -> np.ndarray
     """
     values = np.zeros(mdp.observation_space.n)
     # BEGIN SOLUTION
+
+    for _ in range (max_iter):
+        new_values = np.copy(values)
+        
+        # Pour chaque état
+        for state in range(mdp.observation_space.n):
+            state_values = []  # Liste pour stocker les valeurs des actions possibles
+            
+            # Pour chaque action
+            for action in range(mdp.action_space.n):
+                # Obtention des données de la transition
+                next_state, reward, done = mdp.P[state][action]
+                
+                state_value = reward + gamma * values[next_state]
+                state_values.append(state_value)
+            
+            # Mise à jour de la valeur de l'état avec la meilleure action (valeur maximale)
+            new_values[state] = max(state_values)
+        
+        # Utilisation de np.allclose pour vérifier si les nouvelles valeurs sont proches des anciennes
+        if np.allclose(values, new_values):
+            break
+        
+        values = new_values  # Mettre à jour les valeurs pour la prochaine itération
+    
     # END SOLUTION
     return values
 
@@ -42,6 +67,44 @@ def grid_world_value_iteration(
     """
     values = np.zeros((4, 4))
     # BEGIN SOLUTION
+    for _ in range(max_iter):
+        delta = 0
+        new_values = np.copy(values)
+
+        # Pour chaque case de la grille:
+        for row in range(env.height):
+            for col in range(env.width):
+
+                # On n'évalue pas les états terminaux ou les murs
+                if env.grid[row, col] in {"P", "N", "W"}:
+                    continue
+
+                # Initialisation des variables pour la mise à jour de la valeur de l'état
+                env.set_state(row, col)
+                max_value = float("-inf") # - infini pour être sûr de ne pas être un faux maximum
+
+                # Pour chaque action:
+                for action in range(env.action_space.n):
+                    next_state, reward, is_done, _ = env.step(action, make_move=False)
+
+                    next_row, next_col = next_state
+                    value = reward + gamma * values[next_row, next_col]
+
+                    max_value = max(max_value, value)
+
+                # Mise à jour de la valeur de l'état (row, col)
+                new_values[row, col] = max_value
+
+                # Calcul du changement maximal (delta)
+                delta = max(delta, np.abs(new_values[row, col] - values[row, col]))
+
+        values = new_values
+
+        # Vérification de la convergence
+        if delta < theta:
+            break
+
+    return values
     # END SOLUTION
 
 
@@ -72,3 +135,4 @@ def stochastic_grid_world_value_iteration(
 ) -> np.ndarray:
     values = np.zeros((4, 4))
     # BEGIN SOLUTION
+    # END SOLUTION

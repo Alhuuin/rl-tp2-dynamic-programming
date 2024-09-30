@@ -45,6 +45,35 @@ class MDP(gym.Env):
 
     def __init__(self):
         # BEGIN SOLUTION
+
+        # Initialisation des 3 états
+        self.observation_space = spaces.Discrete(3)
+
+        # Initialisation de 2 actions
+        self.action_space = spaces.Discrete(2)
+
+        # Initialisation de la matrice de transition
+        self.P = [
+            # Pour l'état 0
+            [
+                (1, -1, False),
+                (0, -1, False),
+            ],
+            # Pour l'état 1
+            [
+                (0, -1, False),
+                (2, -1, False),
+            ],
+            # Pour l'état 2
+            [
+                (2, 0, False),
+                (0, -1, False),
+            ]
+        ]
+
+        # Initialisation de l'état initial
+        self.reset_state()
+
         # END SOLUTION
 
     def reset_state(self, value: t.Optional[int] = None):
@@ -66,4 +95,15 @@ class MDP(gym.Env):
         si l'épisode est terminé, et un dictionnaire d'informations.
         """
         # BEGIN SOLUTION
+
+        # On récupère les informations de transition pour l'état courant et l'action donnée
+        next_state, reward, done = self.P[self.initial_state][action]
+        
+        # Mise à jour de l'état courant si transition
+        if transition:
+            self.initial_state = next_state
+            
+        # Retourne (next_state, reward, done, info)
+        return next_state, reward, done, {}
+
         # END SOLUTION
