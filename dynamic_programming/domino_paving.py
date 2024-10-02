@@ -18,4 +18,15 @@ def domino_paving(n: int) -> int:
     """
     a = 0
     # BEGIN SOLUTION
+
+    # Initialisation des valeurs de base (nous utilisons n-4, donc nous avons besoin d'initialiser au moins jusqu'à 3)
+    if n == 0:
+        return 1
+    elif n == 1 or n == 3:
+        return 0
+    elif n == 2:
+        return 3
+
+    # Formule de récurrence
+    return 4 * domino_paving(n - 2) - domino_paving(n - 4)
     # END SOLUTION

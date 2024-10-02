@@ -37,7 +37,7 @@ def mdp_value_iteration(mdp: MDP, max_iter: int = 1000, gamma=1.0) -> np.ndarray
             # Pour chaque action
             for action in range(mdp.action_space.n):
                 # Obtention des données de la transition
-                next_state, reward, done = mdp.P[state][action]
+                next_state, reward, _ = mdp.P[state][action]
                 
                 state_value = reward + gamma * values[next_state]
                 state_values.append(state_value)
@@ -85,7 +85,7 @@ def grid_world_value_iteration(
 
                 # Pour chaque action:
                 for action in range(env.action_space.n):
-                    next_state, reward, is_done, _ = env.step(action, make_move=False)
+                    next_state, reward, _ , _ = env.step(action, make_move=False)
 
                     next_row, next_col = next_state
                     value = reward + gamma * values[next_row, next_col]
@@ -135,4 +135,28 @@ def stochastic_grid_world_value_iteration(
 ) -> np.ndarray:
     values = np.zeros((4, 4))
     # BEGIN SOLUTION
+    for _ in range(max_iter):
+        delta = 0
+        prev_values = values.copy()
+        
+        # Pour chaque position
+        for row in range(env.height):
+            for col in range(env.width):
+                # On ignore les murs et les positions gagnantes ou perdantes (donc finales)
+                if env.grid[row, col] in ['W', 'P', 'N']:
+                    continue
+                
+                # Initialisation de la nouvelle position
+                env.set_state(row, col)
+                
+                # Mise à jour des valeurs et de delta
+                delta = value_iteration_per_state(
+                    env, values, gamma, prev_values, delta
+                )
+        
+        # On vérifie la convergence
+        if delta < theta:
+            break
+    
+    return values
     # END SOLUTION
