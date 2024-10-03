@@ -151,7 +151,7 @@ def stochastic_grid_world_value_iteration(
                 
                 # Mise à jour des valeurs et de delta
                 delta = value_iteration_per_state(
-                    env, values, gamma, prev_values, delta
+                    env, values, gamma, prev_values, theta
                 )
         
         # On vérifie la convergence
